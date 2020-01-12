@@ -15,63 +15,38 @@
 
 let CLIENT_ID = "";
 let CLIENT_SECRET = "";
-let REDIRECT_URI = "https://localhost";
+let REDIRECT_URI = "https://localhost/";
 
-let positive_emotions = [
-  "adventurous",
-  "amused",
-  "celebrating",
-  "excited",
-  "flirty",
-  "happy",
-  "inspired",
-  "productive",
-  "relaxed",
-  "romantic",
-  "social"
-];
-let negative_emotions = [
-  "afraid",
-  "angry",
-  "annoyed",
-  "anxiety",
-  "confused",
-  "depression",
-  "disappointed",
-  "lonely",
-  "nervous",
-  "sad",
-  "sick",
-  "tired"
-];
-let emoji = {
+let emotions = [
   //positive
-  "adventurous": '🏞',
-  "amused":'🤣',
-  "celebrating":'🥳',
-  "excited":'😁',
-  "flirty":'😘',
-  "happy":'🙂',
-  "inspired":'💡',
-  "productive": '📈',
-  "relaxed":'😌',
-  "romantic":'🥰',
-  "social":'🗣',
+  {emotion:"adventurous", emoji:'🏞', score:1},
+  {emotion:"amused", emoji:'🤣', score:1},
+  {emotion:"celebrating", emoji:'🥳', score:1},
+  {emotion:"excited", emoji:'😁', score:1},
+  {emotion:"energetic", emoji:'🔥', score:1},
+  {emotion:"flirty", emoji:'😘', score:1},
+  {emotion:"happy", emoji:'🙂', score:1},
+  {emotion:"inspired", emoji:'💡', score:1},
+  {emotion:"productive", emoji:'📈', score:1},
+  {emotion:"relaxed", emoji:'😌', score:1},
+  {emotion:"romantic", emoji:'🥰', score:1},
+  {emotion:"social", emoji:'🗣', score:1},
 
   //negative
-  "afraid":'😨',
-  "angry":'😡',
-  "annoyed":'😖',
-  "anxiety":'😟',
-  "confused":'😕',
-  "depression":'😓',
-  "disappointed":'😞',
-  "lonely":'🙍',
-  "nervous":'😅',
-  "sad":'🙁',
-  "sick":'🤒',
-  "tired":'😴'
-}
+  {emotion:"afraid", emoji:'😨', score:-1},
+  {emotion:"angry", emoji:'😡', score:-1},
+  {emotion:"annoyed", emoji:'😖', score:-1},
+  {emotion:"anxiety", emoji:'😟', score:-1},
+  {emotion:"confused", emoji:'😕', score:-1},
+  {emotion:"depression", emoji:'😓', score:-1},
+  {emotion:"disappointed", emoji:'😞', score:-1},
+  {emotion:"lonely", emoji:'🙍', score:-1},
+  {emotion:"nervous", emoji:'😅', score:-1},
+  {emotion:"sad", emoji:'🙁', score:-1},
+  {emotion:"sick", emoji:'🤒', score:-1},
+  {emotion:"tired", emoji:'😴', score:-1},
+];
+
 let score = 0;
 let checkboxes = {}
 let progressBar = mdc.linearProgress.MDCLinearProgress.attachTo(document.querySelector('.mdc-linear-progress'));
@@ -90,6 +65,14 @@ let client = new jso.JSO({
 let fetcher = new jso.Fetcher(client)
 client.callback();
 check_token();
+
+function get_score(emotion) {
+  for(e of emotions) {
+    if(e.emotion == emotion)
+      return e.score;
+  }
+  return 0;
+}
 
 function check_token() {
   if(client.checkToken() !== null) {
@@ -125,15 +108,19 @@ function shuffleArray(array) {
 
 function update_score() {
   var count = 0;
+  var positive = "";
+  var negative = "";
   score = 0;
 
   for (const [name,checkbox] of Object.entries(checkboxes)) {
     if(checkbox.checked) {
-      if(positive_emotions.includes(name)) {
-        score++;
-        count++;
-      } else if(negative_emotions.includes(name)) {
-        score--;
+      s = get_score(name);
+      if(s != 0) {
+        if(s > 0)
+          positive += $('#' + name).attr('data-emoji');
+        else
+          negative += $('#' + name).attr('data-emoji');
+        score+=s;
         count++;
       }
     }
@@ -151,19 +138,25 @@ function update_score() {
     score = 3;
   }
   score = Math.round(score);
-  $('#score').html(`Overall mood score for today: <span class='score${score}'>${score}</span>`);
+  $('#score').html(`Overall mood score for today: <span class='score${score}'>${score}</span><br/><span class='negative'>${negative}</span><span class='positive'>${positive}</span>`);
 }
 
 function insert_tag(name, label, checked) {
   if(!(name in checkboxes)) {
-    if(name in emoji)
-      label = emoji[name] + "&nbsp;" + label;
+    var emoji = null;
+    for(e of emotions) {
+      if(e.emotion == name) {
+        label = e.emoji + "&nbsp;" + label;
+        emoji = e.emoji;
+        break;
+      }
+    }
     
     var form_field = $(`<div class="mdc-form-field">
         <div class="mdc-checkbox" id="mdc-${name}">
           <input type="checkbox"
                  class="mdc-checkbox__native-control"
-                 id="${name}" onChange="update_score()"/>
+                 id="${name}" onChange="update_score()" data-emoji="${emoji}"/>
           <div class="mdc-checkbox__background">
             <svg class="mdc-checkbox__checkmark"
                  viewBox="0 0 24 24">
@@ -178,7 +171,7 @@ function insert_tag(name, label, checked) {
         <label for="${name}">${label}</label>
       </div>`);
 
-    if(positive_emotions.includes(name) || negative_emotions.includes(name))
+    if(emoji != null)
       $('#emo_tags').append(form_field);
     else
       $('#other_tags').append(form_field);
@@ -188,11 +181,10 @@ function insert_tag(name, label, checked) {
 }
 
 function render_attributes(attributes) {
-  emotions = positive_emotions.concat(negative_emotions);
   shuffleArray(emotions);
 
   emotions.forEach(emotion => {
-    insert_tag(emotion, emotion, 0);
+    insert_tag(emotion.emotion, emotion.emotion, 0);
   })
 
   attributes.forEach(attribute => {

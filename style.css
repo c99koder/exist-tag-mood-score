@@ -33,3 +33,9 @@ body {
 .score5 {
   color: #00B50C;
 }
+.positive {
+  background-color: #00B50C;
+}
+.negative {
+  background-color: #DF3E3E;
+}
