@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-let CLIENT_ID = "";
-let CLIENT_SECRET = "";
-let REDIRECT_URI = "https://localhost/";
+const CLIENT_ID = "";
+const CLIENT_SECRET = "";
+const REDIRECT_URI = "https://localhost/";
 
-let emotions = [
+const emotions = [
   //positive
   {emotion:"adventurous", emoji:'🏞', score:1},
   {emotion:"amused", emoji:'🤣', score:1},
@@ -51,11 +51,11 @@ let emotions = [
 ];
 
 let score = 0;
-let checkboxes = {}
-let progressBar = mdc.linearProgress.MDCLinearProgress.attachTo(document.querySelector('.mdc-linear-progress'));
-let newTagField = mdc.textField.MDCTextField.attachTo(document.querySelector('.mdc-text-field'));
-let snackbar = mdc.snackbar.MDCSnackbar.attachTo(document.querySelector('.mdc-snackbar'));
-let client = new jso.JSO({
+const checkboxes = {}
+const progressBar = mdc.linearProgress.MDCLinearProgress.attachTo(document.querySelector('.mdc-linear-progress'));
+const newTagField = mdc.textField.MDCTextField.attachTo(document.querySelector('.mdc-text-field'));
+const snackbar = mdc.snackbar.MDCSnackbar.attachTo(document.querySelector('.mdc-snackbar'));
+const client = new jso.JSO({
   providerID: "exist",
   client_id: CLIENT_ID,
   authorization: "https://exist.io/oauth2/authorize",
@@ -65,7 +65,7 @@ let client = new jso.JSO({
   redirect_uri: REDIRECT_URI,
   scopes: { request: ["read+write"]}
 })
-let fetcher = new jso.Fetcher(client)
+const fetcher = new jso.Fetcher(client)
 client.callback();
 check_token();
 
