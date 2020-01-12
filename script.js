@@ -76,12 +76,13 @@ let score = 0;
 let checkboxes = {}
 let progressBar = mdc.linearProgress.MDCLinearProgress.attachTo(document.querySelector('.mdc-linear-progress'));
 let newTagField = mdc.textField.MDCTextField.attachTo(document.querySelector('.mdc-text-field'));
+let snackbar = mdc.snackbar.MDCSnackbar.attachTo(document.querySelector('.mdc-snackbar'));
 let client = new jso.JSO({
-	providerID: "exist",
-	client_id: CLIENT_ID,
+  providerID: "exist",
+  client_id: CLIENT_ID,
   authorization: "https://exist.io/oauth2/authorize",
   response_type: 'code',
-	client_secret: CLIENT_SECRET,
+  client_secret: CLIENT_SECRET,
   token: "https://exist.io/oauth2/access_token",
   redirect_uri: REDIRECT_URI,
   scopes: { request: ["read+write"]}
@@ -91,10 +92,14 @@ client.callback();
 check_token();
 
 function check_token() {
-  if(client.checkToken() !== null)
-    fetch_profile();
-  else
+  if(client.checkToken() !== null) {
+    if(location.href.includes('?'))
+      window.location.href = window.location.href.split("?")[0];
+    else
+      fetch_profile();
+  } else {
     setTimeout(check_token, 500);
+  }
 }
 
 function render_profile(profile) {
@@ -211,6 +216,9 @@ function fetch_profile() {
   })
   .catch((err) => {
     console.error("Error from fetcher", err);
+    snackbar.labelText = "Failed to load profile";
+    snackbar.open();
+    logout();
   })
 }
 
@@ -233,11 +241,10 @@ function save() {
   for (const [name,checkbox] of Object.entries(checkboxes)) {
     if(checkbox.checked) {
       if(tags.length > 0)
-        tags += ", ";
+        tags += ",";
       tags += name;
     }
   }
-  console.log("Tags: " + tags);
 
   fetcher.fetch('https://exist.io/api/1/attributes/acquire/', {
     method: 'POST',
@@ -249,7 +256,7 @@ function save() {
   .then(data => data.json())
   .then(data => {
     if(data.failed.length == 0) {
-      date = new Date().toISOString().slice(0,10);
+      date = new Date().getFullYear()+'-'+("0"+(new Date().getMonth()+1)).slice(-2)+'-'+("0"+new Date().getDate()).slice(-2);
       fetcher.fetch('https://exist.io/api/1/attributes/update/', {
         method: 'POST',
         headers: {
@@ -263,25 +270,31 @@ function save() {
         $('.mdc-button').attr("disabled", false);
         if(data.failed.length > 0) {
           console.error("Failed to save tags", data.failed);
-          alert("Failed to save tags");
+          snackbar.labelText = "Failed to save tags";
+        } else {
+          snackbar.labelText = "Tags saved successfully";
         }
+        snackbar.open();
       })
       .catch((err) => {
         console.error("Error from fetcher", err);
         progressBar.determinate = true;
         $('.mdc-button').attr("disabled", false);
-        alert("Failed to save tags");
+        snackbar.labelText = "Failed to save tags";
+        snackbar.open();
       })
     } else {
       console.error("Failed to acquire attributes", data.failed);
-      alert("Failed to acquire attributes");
+      snackbar.labelText = "Failed to acquire attributes";
+      snackbar.open();
     }
   })
   .catch((err) => {
     console.error("Error from fetcher", err);
     progressBar.determinate = true;
     $('.mdc-button').attr("disabled", false);
-    alert("Failed to acquire attributes");
+    snackbar.labelText = "Failed to acquire attributes";
+    snackbar.open();
   })
 }
 
