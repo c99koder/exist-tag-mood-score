@@ -1,0 +1,35 @@
+body {
+  --mdc-theme-primary: #017cb1;
+  --mdc-theme-secondary: #017cb1;
+  margin: 0;
+}
+.mdc-form-field {
+  width: 300px;
+}
+.mdc-text-field {
+  background-color: transparent !important;
+}
+.mdc-text-field--focused {
+  background-color: transparent !important;
+}
+.mdc-form-field label {
+  text-transform: capitalize;
+}
+.mdc-floating-label--float-above {
+  color: #017cb1 !important;
+}
+.score1 {
+  color: #DF3E3E;
+}
+.score2 {
+  color: #DF953E;
+}
+.score3 {
+  color: #B1D020;
+}
+.score4 {
+  color: #68DB36;
+}
+.score5 {
+  color: #00B50C;
+}
