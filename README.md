@@ -1,5 +1,5 @@
 # Exist Tag Mood Score
-Calculate a mood score based on positive and negative tags in Exist
+Calculate a mood score based on the percentage of positive and negative tags in Exist
 
 ## Configuration
 Register an app at https://exist.io/account/apps/ and set your client ID, secret, and redirect URI at the top of `script.js`
