@@ -53,13 +53,21 @@
         <div id="emo_tags"></div>
         <h2>What did you do today?</h2>
         <div id="other_tags"></div>
-        <div class="mdc-text-field">
+        <label class="mdc-text-field" id="new-tag-field">
           <input type="text" id="new-tag" class="mdc-text-field__input" onKeyUp="if (event.keyCode == 13) $('.add-button').click();">
           <label class="mdc-floating-label" for="new-tag">Add A New Tag</label>
           <div class="mdc-line-ripple"></div>
-        </div>
+        </label>
         <button class="add-button mdc-button mdc-button--raised" onclick="insert_tag(newTagField.value.replace(/ /g,'_').toLowerCase(), newTagField.value, true); newTagField.value = '';">Add</button>
         <h2 id="score"></h2>
+        <h2>Any notes?</h2>
+        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea mdc-text-field--no-label" id="notes-field">
+          <textarea class="mdc-text-field__input" rows="4" cols="60" aria-label="Notes" id="notes"></textarea>
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+        </label>
         <p>
           <button class="save-button mdc-button mdc-button--raised" onclick="save()">Save</button>
           <button class="logout-button mdc-button mdc-button--raised" style="background-color: red;" onclick="logout()">Logout</button>

@@ -53,7 +53,8 @@ const emotions = [
 let score = 0;
 const checkboxes = {}
 const progressBar = mdc.linearProgress.MDCLinearProgress.attachTo(document.querySelector('.mdc-linear-progress'));
-const newTagField = mdc.textField.MDCTextField.attachTo(document.querySelector('.mdc-text-field'));
+const newTagField = mdc.textField.MDCTextField.attachTo(document.querySelector('#new-tag-field'));
+const notesField = mdc.textField.MDCTextField.attachTo(document.querySelector('#notes-field'));
 const snackbar = mdc.snackbar.MDCSnackbar.attachTo(document.querySelector('.mdc-snackbar'));
 const client = new jso.JSO({
   providerID: "exist",
@@ -194,6 +195,9 @@ function render_attributes(attributes) {
     if(attribute.attribute != "custom" && attribute.group.name == "custom") {
       insert_tag(attribute.attribute, attribute.label, attribute.values.length == 1 && attribute.values[0].value == 1);
     }
+    if(attribute.attribute == "mood_note" && attribute.values.length == 1) {
+      notesField.value = attribute.values[0].value;
+    }
   })
 
   progressBar.determinate = true;
@@ -218,7 +222,7 @@ function fetch_profile() {
 }
 
 function fetch_attributes() {
-  fetcher.fetch('https://exist.io/api/1/users/$self/attributes/?limit=1&groups=custom,mood')
+  fetcher.fetch('https://exist.io/api/1/users/$self/attributes/?limit=1&groups=custom,mood,mood_note')
   .then(data => data.json())
   .then(data => {
     render_attributes(data);
@@ -246,7 +250,7 @@ function save() {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify([{"name":"mood", "active":true}, {"name":"custom", "active":true}])
+    body: JSON.stringify([{"name":"mood", "active":true}, {"name":"mood_note", "active":true}, {"name":"custom", "active":true}])
   })
   .then(data => data.json())
   .then(data => {
@@ -257,7 +261,7 @@ function save() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify([{"name":"mood", "date":date, "value":score}, {"name":"custom", "date":date, "value":tags}])
+        body: JSON.stringify([{"name":"mood", "date":date, "value":score}, {"name":"mood_note", "date":date, "value":notesField.value}, {"name":"custom", "date":date, "value":tags}])
       })
       .then(data => data.json())
       .then(data => {
