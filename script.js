@@ -195,7 +195,7 @@ function render_attributes(attributes) {
     if(attribute.attribute != "custom" && attribute.group.name == "custom") {
       insert_tag(attribute.attribute, attribute.label, attribute.values.length == 1 && attribute.values[0].value == 1);
     }
-    if(attribute.attribute == "mood_note" && attribute.values.length == 1) {
+    if(attribute.attribute == "mood_note" && attribute.values.length == 1 && attribute.values[0].value != null) {
       notesField.value = attribute.values[0].value;
     }
   })
