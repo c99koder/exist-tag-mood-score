@@ -51,6 +51,7 @@ const emotions = [
 ];
 
 let score = 0;
+let max_score = 5;
 const checkboxes = {}
 const progressBar = mdc.linearProgress.MDCLinearProgress.attachTo(document.querySelector('.mdc-linear-progress'));
 const newTagField = mdc.textField.MDCTextField.attachTo(document.querySelector('#new-tag-field'));
@@ -131,18 +132,19 @@ function update_score() {
   }
 
   if(count > 0) {
-    var ratio = 2.0 / count;
-    if(count < 3)
+    var ratio = Math.floor(max_score / 2) / count;
+    if(count < Math.ceil(max_score / 2))
       ratio = 1;
 
     score *= ratio;
 
-    score += 3;
+    score += Math.ceil(max_score / 2);
   } else {
-    score = 3;
+    score = Math.floor(max_score / 2) + 1;
   }
   score = Math.round(score);
-  $('#score').html(`Overall mood score for today: <span class='score${score}'>${score}</span><br/><span class='negative'>${negative}</span><span class='positive'>${positive}</span>`);
+  color = Math.round((score / max_score) * 5);
+  $('#score').html(`Overall mood score for today: <span class='score${color}'>${score}</span><br/><span class='negative'>${negative}</span><span class='positive'>${positive}</span>`);
 }
 
 function insert_tag(name, label, checked) {
@@ -198,6 +200,8 @@ function render_attributes(attributes) {
     if(attribute.attribute == "mood_note" && attribute.values.length == 1 && attribute.values[0].value != null) {
       notesField.value = attribute.values[0].value;
     }
+    if(attribute.attribute == "mood" && attribute.value_type == 8)
+      max_score = 9;
   })
 
   progressBar.determinate = true;
